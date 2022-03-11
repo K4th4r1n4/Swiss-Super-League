@@ -1,0 +1,5 @@
+# web scraping
+requests
+bs4
+# data wrangling
+pandas
