@@ -35,6 +35,7 @@ SEASON_MAP = {
 class TeamScore:
     def __init__(self):
         self.team_name = None
+        self.rank = None
         self.games_played = None
         self.win = None
         self.draw = None
@@ -45,6 +46,7 @@ class TeamScore:
 
     def __iter__(self):
         yield 'team_name', self.team_name
+        yield 'rank', self.rank
         yield 'games_played', self.games_played
         yield 'win', self.win
         yield 'draw', self.draw
@@ -75,10 +77,11 @@ def scrape_season(season: str) -> pd.DataFrame:
     table = soup.find_all('table')[0].find_all('tr')
 
     # loop over teams
-    for team in table:
+    for i, team in enumerate(table):
         team_score = TeamScore()
         team_score.team_name = team.find(
             class_="team-image team-image-").find('img').get('title')
+        team_score.rank = i + 1
         team_score.games_played = int(
             team.find(class_="standing-games_played").text)
         team_score.win = int(team.find(class_="standing-win").text)
@@ -113,7 +116,8 @@ def save_data(data: pd.DataFrame) -> None:
 
     :param data: data to save
     """
-    data.to_csv('../../data/raw/raw_data.csv', sep=',', index=False)
+    data.to_csv('../../data/raw/raw_data_final_score.csv',
+                sep=',', index=False)
 
 
 def main(args=None):
