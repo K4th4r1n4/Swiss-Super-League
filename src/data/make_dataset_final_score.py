@@ -2,7 +2,7 @@
 # *_* coding: utf-8 *_*
 
 """
-module docstring - short summary
+Module to create dataset of Swiss Super League final scores.
 """
 
 __version__ = "1.0.0"
@@ -17,7 +17,7 @@ from random import choice
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-from typing import Union
+from typing import List
 
 
 DELAYS = [1, 3, 5, 8]
@@ -56,12 +56,29 @@ class TeamScore:
         yield 'points', self.points
 
 
-def scrape_season(season: str) -> pd.DataFrame:
+def scrape_season_final_score(season: str) -> pd.DataFrame:
     """Scrape final result of Swiss Super League for season.
 
-    :param season: season to scrape
+    Args:
+        season (str): The season to scrape.
 
-    :return: pandas.DataFrame containing season data
+    Returns:
+        pd.DataFrame: A dataframe containing the scraped data of `season`.
+
+    Examples:
+        >>> scrape_season_final_score('2020-2021')
+          season          team_name  rank  ...  goal_diff  difference  points
+    0  2020-2021     BSC Young Boys     1  ...      74:29          45      84
+    0  2020-2021           FC Basel     2  ...      60:53           7      53
+    0  2020-2021    Servette Genève     3  ...      45:56         -11      50
+    0  2020-2021          FC Lugano     4  ...      40:42          -2      49
+    0  2020-2021          FC Luzern     5  ...      62:59           3      46
+    0  2020-2021  FC Lausanne-Sport     6  ...      52:55          -3      46
+    0  2020-2021      FC St. Gallen     7  ...      45:48          -3      44
+    0  2020-2021          FC Zürich     8  ...      53:57          -4      43
+    0  2020-2021            FC Sion     9  ...      48:58         -10      38
+    0  2020-2021           FC Vaduz    10  ...      36:58         -22      36
+    [10 rows x 10 columns]
     """
     url = 'https://www.sport.de/fussball/schweiz-super-league/' + \
           f'{SEASON_MAP[season]}/{season}/ergebnisse-und-tabelle/'
@@ -98,23 +115,55 @@ def scrape_season(season: str) -> pd.DataFrame:
     return results
 
 
-def get_data(seasons: Union[list, str]) -> pd.DataFrame:
+def get_final_score_data(seasons: List[str]) -> pd.DataFrame:
     """Get final result of Swiss Super League for seasons.
 
-    :param seasons: season(s) to scrape
+    Args:
+        seasons (List[str]): The season(s) to scrape.
 
-    :return: pandas.DataFrame containing data of seasons
+    Returns:
+        pd.DataFrame: A dataframe containing the scraped data of `seasons`.
+
+    Examples:
+        >>> get_final_score_data(['2019-2020', '2020-2021'])
+          season            team_name  rank  ...  goal_diff  difference  points
+    0  2019-2020       BSC Young Boys     1  ...      80:41          39      76
+    0  2019-2020        FC St. Gallen     2  ...      79:56          23      68
+    0  2019-2020             FC Basel     3  ...      74:38          36      62
+    0  2019-2020      Servette Genève     4  ...      57:48           9      49
+    0  2019-2020            FC Lugano     5  ...      46:46           0      47
+    0  2019-2020            FC Luzern     6  ...      42:50          -8      46
+    0  2019-2020            FC Zürich     7  ...      45:72         -27      43
+    0  2019-2020              FC Sion     8  ...      40:55         -15      39
+    0  2019-2020              FC Thun     9  ...      45:67         -22      38
+    0  2019-2020  Neuchâtel Xamax FCS    10  ...      33:68         -35      27
+    0  2020-2021       BSC Young Boys     1  ...      74:29          45      84
+    0  2020-2021             FC Basel     2  ...      60:53           7      53
+    0  2020-2021      Servette Genève     3  ...      45:56         -11      50
+    0  2020-2021            FC Lugano     4  ...      40:42          -2      49
+    0  2020-2021            FC Luzern     5  ...      62:59           3      46
+    0  2020-2021    FC Lausanne-Sport     6  ...      52:55          -3      46
+    0  2020-2021        FC St. Gallen     7  ...      45:48          -3      44
+    0  2020-2021            FC Zürich     8  ...      53:57          -4      43
+    0  2020-2021              FC Sion     9  ...      48:58         -10      38
+    0  2020-2021             FC Vaduz    10  ...      36:58         -22      36
+    [20 rows x 10 columns]
     """
     data = pd.DataFrame()
     for season in seasons:
-        data = data.append(scrape_season(season))
+        data = data.append(scrape_season_final_score(season))
     return data
 
 
-def save_data(data: pd.DataFrame) -> None:
+def save_final_score_data(data: pd.DataFrame) -> None:
     """Save final result of Swiss Super League for seasons.
 
-    :param data: data to save
+    Args:
+        data (pd.DataFrame): The dataframe to save.
+
+    Examples:
+        >>> ssl_data_final = get_final_score_data(['2019-2020', '2020-2021'])
+        >>> save_final_score_data(ssl_data_final)
     """
     data.to_csv('../../data/raw/raw_data_final_score.csv',
                 sep=',', index=False)
@@ -127,10 +176,10 @@ def main(args=None):
         seasons = SEASON_MAP.keys()
 
     # scrape seasons
-    raw_data = get_data(seasons)
+    raw_data = get_final_score_data(seasons)
 
     # save data
-    save_data(raw_data)
+    save_final_score_data(raw_data)
 
 
 if "__main__" == __name__:

@@ -2,7 +2,7 @@
 # *_* coding: utf-8 *_*
 
 """
-module docstring - short summary
+Module to create dataset of a full Swiss Super League season.
 """
 
 __version__ = "1.0.0"
@@ -17,7 +17,6 @@ from random import choice
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-from typing import Union
 
 
 DELAYS = [1.5, 4, 5, 6.5]
@@ -43,9 +42,17 @@ class Match:
 def scrape_full_season(season: str) -> pd.DataFrame:
     """Scrape full season data of Swiss Super League.
 
-    :param season: season to scrape
+    Args:
+        season (str): The season to scrape.
 
-    :return: pandas.DataFrame containing season data
+    Returns:
+        pd.DataFrame: A dataframe containing the scraped data of full `season`.
+
+    Examples:
+        >>> scrape_full_season('2020-2021')
+      season  match_day      team1      team2                 scheme   result
+0  2020-2021          1  FC Lugano  FC Luzern  FC Lugano - FC Luzern      2:1
+...
     """
     results = pd.DataFrame()
     for i in range(1, MATCH_DAYS+1):
@@ -60,7 +67,7 @@ def scrape_full_season(season: str) -> pd.DataFrame:
         # get table of match day results
         soup = BeautifulSoup(
             str(BeautifulSoup(r.content, "html.parser")).split(
-                '<!-- DYNAMIC BOX -->')[1].split(
+                '<!-- DYNAMIC BOX -->')[0].split(
                 '<!-- /DYNAMIC BOX -->')[0], "html.parser")
 
         # loop over all matches of match day 'i'
@@ -81,9 +88,14 @@ def scrape_full_season(season: str) -> pd.DataFrame:
 
 
 def save_full_season_data(data: pd.DataFrame) -> None:
-    """Save final result of Swiss Super League for seasons.
+    """Save result of Swiss Super League for full season(s).
 
-    :param data: data to save
+    Args:
+        data (pd.DataFrame): The dataframe to save.
+
+    Examples:
+        >>> ssl_data_full_season = scrape_full_season('2020-2021')
+        >>> save_full_season_data(ssl_data_full_season)
     """
     data.to_csv('../../data/raw/raw_data_full_season.csv',
                 sep=',', index=False)

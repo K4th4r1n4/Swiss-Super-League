@@ -3,3 +3,5 @@ requests
 bs4
 # data wrangling
 pandas
+# documentation
+pdoc3
