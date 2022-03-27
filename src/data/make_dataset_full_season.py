@@ -12,6 +12,7 @@ __author__ = "K4th4r1n4"
 
 # import stuff
 import argparse
+from typing import List
 from time import sleep
 from random import choice
 import requests
@@ -22,8 +23,24 @@ import pandas as pd
 DELAYS = [1.5, 4, 5, 6.5]
 MATCH_DAYS = 36
 
+SEASONS = [
+    '2003-2004', '2004-2005', '2005-2006', '2006-2007', '2007-2008',
+    '2008-2009', '2009-2010', '2010-2011', '2011-2012', '2012-2013',
+    '2013-2014', '2014-2015', '2015-2016', '2016-2017', '2017-2018',
+    '2018-2019', '2019-2020', '2020-2021',
+]
+
 
 class Match:
+    """A class representing one match in the Swiss Super League.
+
+    Attributes:
+        match_day (Union[None, int]): The match day. Defaults to None.
+        team1 (Union[None, str]): The home team. Defaults to None.
+        team2 (Union[None, str]): The away team. Defaults to None.
+        scheme (Union[None, str]): The game scheme. Defaults to None.
+        result (Union[None, str]): The result. Defaults to None.
+    """
     def __init__(self):
         self.match_day = None
         self.team1 = None
@@ -50,9 +67,19 @@ def scrape_full_season(season: str) -> pd.DataFrame:
 
     Examples:
         >>> scrape_full_season('2020-2021')
-      season  match_day      team1      team2                 scheme   result
-0  2020-2021          1  FC Lugano  FC Luzern  FC Lugano - FC Luzern      2:1
-...
+           season  ...  result
+    0   2020-2021  ...     2:1
+    0   2020-2021  ...     2:1
+    0   2020-2021  ...     2:2
+    0   2020-2021  ...     2:1
+    0   2020-2021  ...     1:0
+    ..        ...  ...     ...
+    0   2020-2021  ...     2:4
+    0   2020-2021  ...     1:2
+    0   2020-2021  ...     1:2
+    0   2020-2021  ...     4:0
+    0   2020-2021  ...     4:1
+    [180 rows x 6 columns]
     """
     results = pd.DataFrame()
     for i in range(1, MATCH_DAYS+1):
@@ -71,7 +98,7 @@ def scrape_full_season(season: str) -> pd.DataFrame:
                 '<!-- /DYNAMIC BOX -->')[0], "html.parser")
 
         # loop over all matches of match day 'i'
-        boxes = soup.find_all('table')[0].find_all('tr')
+        boxes = soup.find_all('table')[1].find_all('tr')
         for box in boxes:
             match = Match()
             match.match_day = i
@@ -85,6 +112,37 @@ def scrape_full_season(season: str) -> pd.DataFrame:
                 [{**{'season': season}, **match.__dict__}]
             ))
     return results
+
+
+def get_full_season_data(seasons: List[str]) -> pd.DataFrame:
+    """Get full season result of Swiss Super League for `seasons`.
+
+    Args:
+        seasons (List[str]): The season(s) to scrape.
+
+    Returns:
+        pd.DataFrame: A dataframe containing the scraped data of `seasons`.
+
+    Examples:
+        >>> get_full_season_data(['2019-2020', '2020-2021'])
+           season  match_day  ...                                          scheme result
+    0   2019-2020          1  ...                  Spielschema FC Sion - FC Basel    1:4
+    0   2019-2020          1  ...       Spielschema FC Thun - Neuchâtel Xamax FCS    2:2
+    0   2019-2020          1  ...           Spielschema FC St. Gallen - FC Luzern    0:2
+    0   2019-2020          1  ...    Spielschema BSC Young Boys - Servette Genève    1:1
+    0   2019-2020          1  ...               Spielschema FC Zürich - FC Lugano    0:4
+    ..        ...        ...  ...                                             ...    ...
+    0   2020-2021         36  ...  Spielschema FC Lausanne-Sport - BSC Young Boys    2:4
+    0   2020-2021         36  ...               Spielschema FC Luzern - FC Lugano    1:2
+    0   2020-2021         36  ...     Spielschema Servette Genève - FC St. Gallen    1:2
+    0   2020-2021         36  ...                  Spielschema FC Sion - FC Basel    4:0
+    0   2020-2021         36  ...                Spielschema FC Zürich - FC Vaduz    4:1
+    [360 rows x 6 columns]
+    """
+    data = pd.DataFrame()
+    for season in seasons:
+        data = data.append(scrape_full_season(season))
+    return data
 
 
 def save_full_season_data(data: pd.DataFrame) -> None:
@@ -102,10 +160,17 @@ def save_full_season_data(data: pd.DataFrame) -> None:
 
 
 def main(args=None):
+    """The main function."""
     # ToDo: get seasons from command line
-    # test = scrape_full_season('2020-2021')
-    # save_full_season_data(test)
-    pass
+    seasons = args.seasons
+    if seasons == 'all':
+        seasons = SEASONS
+
+    # scrape seasons
+    raw_data = get_full_season_data(seasons)
+
+    # save data
+    save_full_season_data(raw_data)
 
 
 if "__main__" == __name__:

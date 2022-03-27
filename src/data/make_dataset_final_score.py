@@ -17,7 +17,7 @@ from random import choice
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-from typing import List
+from typing import List, Union
 
 
 DELAYS = [1, 3, 5, 8]
@@ -33,6 +33,25 @@ SEASON_MAP = {
 
 
 class TeamScore:
+    """A class representing the final score of a team in the Swiss Super League
+    at the end of one season.
+
+    Attributes:
+        team_name (Union[None, str]): The team name. Defaults to None.
+        rank (Union[None, int]): The final ranking. Defaults to None.
+        games_played (Union[None, int]): The number of games played. Defaults
+            to None.
+        win (Union[None, int]): The number of games won. Defaults to None.
+        draw (Union[None, int]): The number of draws. Defaults to None.
+        lost (Union[None, int]): The number of games lost. Defaults to None.
+        goal_diff (Union[None, str]): The number of goals scored and goals
+            conceded. The Defaults to None.
+        difference (Union[None, int]): The goal difference, meaning the number
+            of goals scored across the season, minus the number of goals
+            conceded. Defaults to None.
+        points (Union[None, int]): The final number of points. Defaults to
+            None.
+    """
     def __init__(self):
         self.team_name = None
         self.rank = None
@@ -116,7 +135,7 @@ def scrape_season_final_score(season: str) -> pd.DataFrame:
 
 
 def get_final_score_data(seasons: List[str]) -> pd.DataFrame:
-    """Get final result of Swiss Super League for seasons.
+    """Get final result of Swiss Super League for `seasons`.
 
     Args:
         seasons (List[str]): The season(s) to scrape.
@@ -170,6 +189,7 @@ def save_final_score_data(data: pd.DataFrame) -> None:
 
 
 def main(args=None):
+    """The main function."""
     # ToDo: get seasons from command line
     seasons = args.seasons
     if seasons == 'all':
