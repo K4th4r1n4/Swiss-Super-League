@@ -19,7 +19,9 @@ docs:
 .PHONY: all docs clean
 
 tests:
-	pdoc3 src -o docs --html
+	./$(VENV)/bin/pip install '.[test]'
+	./$(VENV)/bin/python3 -m coverage run --source src -m pytest tests
+	./$(VENV)/bin/python3 -m coverage report
 
 .PHONY: all tests clean
 
@@ -30,5 +32,6 @@ clean:
 	rm -rf $(VENV)
 	find . -type f -name '*.pyc' -delete
 	rm -rf docs/*
+	rm .coverage
 
 .PHONY: all venv run clean

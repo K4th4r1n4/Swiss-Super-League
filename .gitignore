@@ -2,4 +2,7 @@
 .DS_Store
 # IDE
 .idea/*
-
+# cache, checkpoints, etc.
+__pycache__
+.ipynb_checkpoints
+.coverage
