@@ -1,0 +1,47 @@
+[project]
+name = "src"
+version = "0.1.0"
+authors = [
+  {name="K4th4rin4"},
+]
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "requests",
+    "bs4",
+    "numpy",
+    "pandas",
+    "plotly",
+    "dash",
+    "pdoc3",
+]
+
+[project.optional-dependencies]
+lint = [
+    "black",
+    "flake8",
+    "isort",
+    "mypy",
+]
+dev = [
+    "ipython",
+    "pyyaml",
+]
+test = [
+    "coverage",
+    "pytest",
+]
+
+[tool.black]
+line-length = 79
+target-version = ['py310']
+include = '\.pyi?$'
+
+[tool.isort]
+py_version=310
+profile = "black"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
